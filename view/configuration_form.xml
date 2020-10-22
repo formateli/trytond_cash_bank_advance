@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- This file is part of Cash & Bank Advance module.
+The COPYRIGHT file at the top level of this repository contains
+the full copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/field[@name='account_transfer']" position="after">
+        <newline/>
+        <label name="default_collected_in_advanced_account"/>
+        <field name="default_collected_in_advanced_account"/>
+        <label name="default_paid_in_advanced_account"/>
+        <field name="default_paid_in_advanced_account"/>
+    </xpath>
+</data>

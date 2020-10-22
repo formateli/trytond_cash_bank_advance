@@ -1,0 +1,19 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "field:cash_bank.configuration,default_collected_in_advanced_account:"
+msgid "Default Collected in Advanced Account"
+msgstr "Cuenta Cobrado por Anticipado por Defecto"
+
+msgctxt "field:cash_bank.configuration.account,default_collected_in_advanced_account:"
+msgid "Default Collected in Advanced Account"
+msgstr "Cuenta Cobrado por Anticipado por Defecto"
+
+msgctxt "field:cash_bank.configuration,default_paid_in_advanced_account:"
+msgid "Default Paid in Advanced Account"
+msgstr "Cuenta Pagado por Anticipado por Defecto"
+
+msgctxt "field:cash_bank.configuration.account,default_paid_in_advanced_account:"
+msgid "Default Paid in Advanced Account"
+msgstr "Cuenta Pagado por Anticipado por Defecto"
