@@ -78,8 +78,10 @@ class Advance(ModelSQL, ModelView):
         return [('', '')] + [(m.model, m.name) for m in models]
 
     def _get_line_amount(self, line):
-        amount = line.line_move.debit - line.line_move.credit
-        return abs(amount)
+        res = Decimal('0.0')
+        if line and line.line_move:
+            res = line.line_move.debit - line.line_move.credit
+        return abs(res)
 
     def get_amount(self, name):
         return self._get_line_amount(self.receipt_line)

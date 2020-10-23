@@ -194,17 +194,27 @@ class ReceiptLine(metaclass=PoolMeta):
             else:
                 if self.advance.type == 'out':
                     amount_to_apply *= -1
-            self._check_invalid_amount(amount_to_apply, self.advance.rec_name)
+
+            check_greater = True
+            if self.type in \
+                    ['advance_in_create', 'advance_out_create']:
+                check_greater = False
+                
+            self._check_invalid_amount(amount_to_apply,
+                    self.advance.rec_name, check_greater=check_greater)
 
     def reconcile(self):
         super(ReceiptLine, self).reconcile()
         pool = Pool()
         Currency = pool.get('currency.currency')
-        Advance = pool.get('cash_bank.advance')
         AdvanceLine = pool.get('cash_bank.advance.line_applied')
         MoveLine = pool.get('account.move.line')
 
         if self.advance:
+            if self.type in \
+                    ['advance_in_create', 'advance_out_create']:
+                return
+
             with Transaction().set_context(date=self.advance.date):
                 amount = Currency.compute(self.receipt.currency,
                     self.amount, self.receipt.company.currency)
@@ -222,8 +232,6 @@ class ReceiptLine(metaclass=PoolMeta):
 
             if remainder == 0:
                 lines = reconcile_lines + [self.line_move]
-                for l in lines:
-                    print(l.debit - l.credit)
                 MoveLine.reconcile(lines)
                 self.advance.state = 'applied'
                 self.advance.save()
