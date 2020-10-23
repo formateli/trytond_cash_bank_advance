@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- This file is part of Cash & Bank Advance module.
+The COPYRIGHT file at the top level of this repository contains
+the full copyright notices and license terms. -->
+<tree>
+    <field name="receipt_line"/>
+    <field name="date"/>
+    <field name="type"/>
+    <field name="amount"/>
+    <field name="amount_applied"/>
+    <field name="amount_to_apply"/>
+    <field name="state"/>
+</tree>

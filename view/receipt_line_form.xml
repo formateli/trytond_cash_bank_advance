@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!-- This file is part of Cash & Bank Advance module.
+The COPYRIGHT file at the top level of this repository contains
+the full copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/field[@name='invoice']" position="after">
+        <label name="advance"/>
+        <field name="advance"/>
+        <label name="advance_origin"/>
+        <field name="advance_origin"/>
+    </xpath>
+</data>
