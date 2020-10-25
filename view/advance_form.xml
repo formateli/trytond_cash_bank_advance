@@ -11,7 +11,8 @@ the full copyright notices and license terms. -->
     <field name="type"/>
     <label name="amount"/>
     <field name="amount"/>
-    <newline/>
+    <label name="origin"/>
+    <field name="origin"/>
     <label name="amount_applied"/>
     <field name="amount_applied"/>
     <label name="amount_to_apply"/>

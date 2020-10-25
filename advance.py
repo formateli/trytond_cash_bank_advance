@@ -6,6 +6,7 @@ from trytond.model import ModelView, ModelSQL, fields
 from trytond.pyson import Eval
 from decimal import Decimal
 
+
 class Advance(ModelSQL, ModelView):
     "Collected/Paid in Advanced"
     __name__ = "cash_bank.advance"
@@ -162,3 +163,40 @@ class AdvanceLineApplied(ModelSQL, ModelView):
     receipt_line = fields.Many2One('cash_bank.receipt.line', 'Receipt Line',
         required=True, ondelete='RESTRICT', select=True,
         states={'readonly': True})
+    date = fields.Function(fields.Date('Date'),
+        'on_change_with_date')
+    currency = fields.Function(
+        fields.Many2One('currency.currency', 'Currency'),
+        'on_change_with_currency')
+    currency_digits = fields.Function(
+        fields.Integer('Currency Digits'),
+        'on_change_with_currency_digits')
+    amount = fields.Function(fields.Numeric('Amount',
+        digits=(16, Eval('currency_digits', 2)),
+        depends=['currency_digits']), 'get_amount')
+
+    @fields.depends('receipt_line',
+                    '_parent_receipt_line.receipt')
+    def on_change_with_date(self, name=None):
+        if self.receipt_line and self.receipt_line.receipt:
+            return self.receipt_line.receipt.date
+
+    @fields.depends('receipt_line',
+                    '_parent_receipt_line.currency')
+    def on_change_with_currency(self, name=None):
+        if self.receipt_line:
+            return self.receipt_line.currency.id
+
+    @fields.depends('currency')
+    def on_change_with_currency_digits(self, name=None):
+        if self.currency:
+            return self.currency.digits
+        return 2
+
+    def get_amount(self, name):
+        res = Decimal('0.0')
+        if self.receipt_line and self.receipt_line.line_move:
+            res = \
+                self.receipt_line.line_move.debit \
+                - self.receipt_line.line_move.credit
+        return abs(res)

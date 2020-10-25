@@ -17,7 +17,7 @@ the full copyright notices and license terms. -->
             <field name="name">advance_tree</field>
         </record>
         <record model="ir.action.act_window" id="act_advance_form">
-            <field name="name">Advance</field>
+            <field name="name">Collected/Paid in Advanced</field>
             <field name="res_model">cash_bank.advance</field>
             <field name="search_value"></field>
         </record>
@@ -76,7 +76,6 @@ the full copyright notices and license terms. -->
             <field name="domain"
                 eval="[('state', '=', 'applied'), ('company', If( And (Eval('context', {}).contains('company'), Eval('context', {}).get('company', None) != None), '=', '!=') , Eval('context', {}).get('company', -1))]"
                 pyson="1"/>
-            <field name="count" eval="True"/>
             <field name="act_window" ref="act_advance_form"/>
         </record>
         <record model="ir.action.act_window.domain" id="act_advance_form_domain_all">
@@ -93,13 +92,42 @@ the full copyright notices and license terms. -->
 
         <record model="ir.model.access" id="access_advance">
             <field name="model" search="[('model', '=', 'cash_bank.advance')]"/>
-            <field name="perm_read" eval="False"/>
+            <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_delete" eval="False"/>
         </record>
         <record model="ir.model.access" id="access_advance_group_cash_bank">
             <field name="model" search="[('model', '=', 'cash_bank.advance')]"/>
+            <field name="group" ref="cash_bank.group_cash_bank"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <!-- Advance Line Applied -->
+
+        <record model="ir.ui.view" id="advance_line_applied_view_form">
+            <field name="model">cash_bank.advance.line_applied</field>
+            <field name="type">form</field>
+            <field name="name">advance_line_applied_form</field>
+        </record>
+        <record model="ir.ui.view" id="advance_line_applied_view_tree">
+            <field name="model">cash_bank.advance.line_applied</field>
+            <field name="type">tree</field>
+            <field name="name">advance_line_applied_tree</field>
+        </record>
+
+        <record model="ir.model.access" id="access_advance_line_applied">
+            <field name="model" search="[('model', '=', 'cash_bank.advance.line_applied')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_advance_line_applied_group_cash_bank">
+            <field name="model" search="[('model', '=', 'cash_bank.advance.line_applied')]"/>
             <field name="group" ref="cash_bank.group_cash_bank"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
