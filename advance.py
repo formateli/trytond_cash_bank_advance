@@ -94,9 +94,6 @@ class Advance(ModelSQL, ModelView):
         return res
 
     def get_amount_to_apply(self, name):
-        res = Decimal('0.0')
-        if self.state != 'pending':
-            return res
         return self.amount - self.amount_applied
 
     @fields.depends('receipt_line',

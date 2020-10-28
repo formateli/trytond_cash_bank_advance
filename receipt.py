@@ -208,16 +208,31 @@ class ReceiptLine(metaclass=PoolMeta):
                 amount_to_apply = Currency.compute(self.advance.currency,
                     self.advance.amount_to_apply,
                     self.receipt.currency)
+
             if self.receipt.type.type == 'in':
-                if self.advance.type == 'in':
+                if self.advance.type == 'in' and \
+                        self.type == 'advance_in_create':
+                    amount_to_apply = 1
+                elif self.advance.type == 'in' and \
+                        self.type == 'advance_out_create':
+                    amount_to_apply = -1
+                elif self.advance.type == 'in' and \
+                        self.type == 'advance_in_apply':
                     amount_to_apply *= -1
-                if self.advance.type == 'out' and \
+                elif self.advance.type == 'out' and \
                         self.type == 'advance_out_create':
                     amount_to_apply = -1
             else:
-                if self.advance.type == 'out':
+                if self.advance.type == 'out' and \
+                        self.type == 'advance_out_create':
+                    amount_to_apply = 1
+                elif self.advance.type == 'out' and \
+                        self.type == 'advance_in_create':
+                    amount_to_apply = -1
+                elif self.advance.type == 'out' and \
+                        self.type == 'advance_out_apply':
                     amount_to_apply *= -1
-                if self.advance.type == 'in' and \
+                elif self.advance.type == 'in' and \
                         self.type == 'advance_in_create':
                     amount_to_apply = -1
 
