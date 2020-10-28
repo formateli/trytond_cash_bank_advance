@@ -136,6 +136,26 @@ class ReceiptLine(metaclass=PoolMeta):
                 )
         cls.party.depends += ['advance']
 
+        cls.account.states['readonly'] = Or(
+                Eval('receipt_state') != 'draft',
+                Not(In(Eval('type'), [
+                    'move_line',
+                    'advance_in_create',
+                    'advance_out_create'
+                    ])),
+                )
+
+        cls.account.domain.append(
+                If (In(Eval('type'),
+                        ['advance_in_create', 'advance_out_create']),
+                    [
+                        ('reconcile', '=', True),
+                        ('party_required', '=', True)
+                    ],
+                    []
+                )
+            )
+
     @classmethod
     def get_advance_origin(cls):
         pool = Pool()
@@ -191,9 +211,15 @@ class ReceiptLine(metaclass=PoolMeta):
             if self.receipt.type.type == 'in':
                 if self.advance.type == 'in':
                     amount_to_apply *= -1
+                if self.advance.type == 'out' and \
+                        self.type == 'advance_out_create':
+                    amount_to_apply = -1
             else:
                 if self.advance.type == 'out':
                     amount_to_apply *= -1
+                if self.advance.type == 'in' and \
+                        self.type == 'advance_in_create':
+                    amount_to_apply = -1
 
             check_greater = True
             if self.type in \

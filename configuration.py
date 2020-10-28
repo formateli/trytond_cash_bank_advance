@@ -10,7 +10,7 @@ class Configuration(metaclass=PoolMeta):
     __name__ = 'cash_bank.configuration'
     default_collected_in_advanced_account = fields.MultiValue(
         fields.Many2One('account.account',
-            'Default Collected in Advanced Account',
+            'Default Collected in Advanced Account', required=True,
             domain=[
                 ('company', '=', Eval('context', {}).get('company', -1)),
                 ('type', '!=', None),
@@ -21,7 +21,7 @@ class Configuration(metaclass=PoolMeta):
             )
     default_paid_in_advanced_account = fields.MultiValue(
         fields.Many2One('account.account',
-            'Default Paid in Advanced Account',
+            'Default Paid in Advanced Account', required=True,
             domain=[
                 ('company', '=', Eval('context', {}).get('company', -1)),
                 ('type', '!=', None),

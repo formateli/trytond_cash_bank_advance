@@ -17,6 +17,7 @@ class AdvanceTestCase(ModuleTestCase):
         Config = pool.get('cash_bank.configuration')
         Receipt = pool.get('cash_bank.receipt')
         Advance = pool.get('cash_bank.advance')
+        AdvanceLineApplied = pool.get('cash_bank.advance.line_applied')
 
 
 def suite():
