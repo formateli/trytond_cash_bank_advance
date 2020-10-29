@@ -92,17 +92,19 @@ class AdvanceTestCase(ModuleTestCase):
                 account, second_account):
         pool = Pool()
         Receipt = pool.get('cash_bank.receipt')
+        Advance = pool.get('cash_bank.advance')
 
         if type_ == 'in':
             type_create = 'advance_in_create'
             type_apply = 'advance_in_apply'
-            receipt_type_apply = 'out'
+            type_inverse = 'out'
         else:
             type_create = 'advance_out_create'
             type_apply = 'advance_out_apply'
-            receipt_type_apply = 'in'
+            type_inverse = 'in'
 
         # Create an advance type of 'type_create'
+
         receipt = self._get_receipt(company, cashier,
                 type_, date, Decimal('100.0'), party)
         receipt.lines = [
@@ -129,16 +131,17 @@ class AdvanceTestCase(ModuleTestCase):
         # Apply partially
 
         receipt = self._get_receipt(company, cashier,
-                receipt_type_apply, date, Decimal('70.0'), party)
+                type_, date, Decimal('130.0'), party)
         receipt.lines = [
-            self._get_receipt_line(
-                account, Decimal('70.0'),
-                type_=type_apply,
-                advance=advance,
-                party=party),
-            ]
+                self._get_receipt_line(
+                    account, Decimal('-70.0'),
+                    type_=type_apply,
+                    advance=advance,
+                    party=party),
+                self._get_receipt_line(
+                    second_account, Decimal('200.0')),
+                ]
         receipt.save()
-
         Receipt.confirm([receipt])
         Receipt.post([receipt])
         self.assertEqual(advance.state, 'pending')
@@ -148,14 +151,16 @@ class AdvanceTestCase(ModuleTestCase):
         # Try to over apply
 
         receipt = self._get_receipt(company, cashier,
-                receipt_type_apply, date, Decimal('80.0'), party)
+                type_, date, Decimal('120.0'), party)
         with self.assertRaises(UserError):
             receipt.lines = [
                 self._get_receipt_line(
-                    account, Decimal('80.0'),
+                    account, Decimal('-80.0'),
                     type_=type_apply,
                     advance=advance,
                     party=party),
+                self._get_receipt_line(
+                    second_account, Decimal('200.0')),
                 ]
             receipt.save()
             Receipt.confirm([receipt])
@@ -163,14 +168,16 @@ class AdvanceTestCase(ModuleTestCase):
 
         # Apply completly
         receipt = self._get_receipt(company, cashier,
-                receipt_type_apply, date, Decimal('30.0'), party)
+                type_, date, Decimal('170.0'), party)
         receipt.lines = [
-            self._get_receipt_line(
-                account, Decimal('30.0'),
-                type_=type_apply,
-                advance=advance,
-                party=party),
-            ]
+                self._get_receipt_line(
+                    account, Decimal('-30.0'),
+                    type_=type_apply,
+                    advance=advance,
+                    party=party),
+                self._get_receipt_line(
+                    second_account, Decimal('200.0')),
+                ]
         receipt.save()
 
         Receipt.confirm([receipt])
@@ -180,6 +187,8 @@ class AdvanceTestCase(ModuleTestCase):
         self.assertEqual(advance.amount_to_apply, Decimal('0.0'))
 
         # Create an advance with wrong sign in create
+
+        Advance.delete(Advance.search([]))
 
         receipt = self._get_receipt(company, cashier,
                 type_, date, Decimal('200.0'), party)
@@ -200,7 +209,7 @@ class AdvanceTestCase(ModuleTestCase):
         Receipt.delete([receipt])
 
         receipt = self._get_receipt(company, cashier,
-                receipt_type_apply, date, Decimal('200.0'), party)
+                type_inverse, date, Decimal('200.0'), party)
         with self.assertRaises(UserError):
             receipt.lines = [
                 self._get_receipt_line(
@@ -217,24 +226,111 @@ class AdvanceTestCase(ModuleTestCase):
         Receipt.draft([receipt])
         Receipt.delete([receipt])
 
+        Advance.delete(Advance.search([]))
+
         receipt = self._get_receipt(company, cashier,
-                receipt_type_apply, date, Decimal('200.0'), party)
+                type_inverse, date, Decimal('200.0'), party)
         receipt.lines = [
-            self._get_receipt_line(
-                account, Decimal('-200.0'),
-                type_=type_create,
-                party=party),
-            self._get_receipt_line(
-                second_account, Decimal('400.0')),
+                self._get_receipt_line(
+                    account, Decimal('-200.0'), # Correct sign
+                    type_=type_create,
+                    party=party),
+                self._get_receipt_line(
+                    second_account, Decimal('400.0')),
             ]
         receipt.save()
         Receipt.confirm([receipt])
         Receipt.post([receipt])
-        advance = receipt.lines[0].advance
-        self.assertEqual(advance.state, 'pending')
+
+        advance = Advance.search([])[0]
         self.assertEqual(advance.amount, Decimal('200.0'))
         self.assertEqual(advance.amount_applied, Decimal('0.0'))
         self.assertEqual(advance.amount_to_apply, Decimal('200.0'))
+        self.assertEqual(advance.state, 'pending')
+
+        # Apply an advance with wrong sign in apply
+
+        receipt = self._get_receipt(company, cashier,
+                type_, date, Decimal('100.0'), party)
+        with self.assertRaises(UserError):
+            receipt.lines = [
+                    self._get_receipt_line(
+                        account, Decimal('200.0'),
+                        type_=type_apply,
+                        advance=advance,
+                        party=party),
+                    self._get_receipt_line(
+                        second_account, Decimal('-100.0')),
+                    ]
+            receipt.save()
+            Receipt.confirm([receipt])
+            Receipt.post([receipt])
+        Receipt.cancel([receipt])
+        Receipt.draft([receipt])
+        Receipt.delete([receipt])
+
+        receipt = self._get_receipt(company, cashier,
+                type_inverse, date, Decimal('100.0'), party)
+        with self.assertRaises(UserError):
+            receipt.lines = [
+                    self._get_receipt_line(
+                        account, Decimal('-200.0'),
+                        type_=type_apply,
+                        advance=advance,
+                        party=party),
+                    self._get_receipt_line(
+                        second_account, Decimal('300.0')),
+                    ]
+            receipt.save()
+            Receipt.confirm([receipt])
+            Receipt.post([receipt])
+        Receipt.cancel([receipt])
+        Receipt.draft([receipt])
+        Receipt.delete([receipt])
+
+        receipt = self._get_receipt(company, cashier,
+                type_inverse, date, Decimal('100.0'), party)
+        receipt.lines = [
+                self._get_receipt_line(
+                    account, Decimal('200.0'), # Correct sign
+                    type_=type_apply,
+                    advance=advance,
+                    party=party),
+                self._get_receipt_line(
+                    second_account, Decimal('-100.0')),
+            ]
+        receipt.save()
+        Receipt.confirm([receipt])
+        Receipt.post([receipt])
+        self.assertEqual(advance.amount, Decimal('200.0'))
+        self.assertEqual(advance.amount_applied, Decimal('200.0'))
+        self.assertEqual(advance.amount_to_apply, Decimal('0.0'))
+        self.assertEqual(advance.state, 'applied')
+
+        # Test Delete
+
+        advances = Advance.search([])
+        Advance.delete(advances)
+
+        receipt = self._get_receipt(company, cashier,
+                type_, date, Decimal('100.0'), party)
+        receipt.lines = [
+            self._get_receipt_line(
+                account, Decimal('100.0'),
+                type_=type_create,
+                party=party),
+            ]
+        receipt.save()
+        Receipt.confirm([receipt])
+        advances = Advance.search([])
+        self.assertEqual(len(advances), 1)
+
+        Receipt.cancel([receipt]) # Here advance is deleted
+        advances = Advance.search([])
+        self.assertEqual(len(advances), 0)
+
+        Receipt.draft([receipt])
+        Receipt.delete([receipt])
 
     def _get_receipt(self, company, cash_bank,
                     receipt_type, date, amount, party):

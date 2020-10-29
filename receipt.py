@@ -3,7 +3,7 @@
 # the full copyright notices and license terms.
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
-from trytond.model import fields
+from trytond.model import Workflow, ModelView, fields
 from trytond.pyson import Eval, In, If, Not, Or, Bool
 
 
@@ -18,31 +18,24 @@ class Receipt(metaclass=PoolMeta):
         if line.type not in ['advance_in_create', 'advance_out_create']:
             return
 
-        if line.advance:
-            advance = line.advance
+        if line.type == 'advance_in_create':
+            type_ = 'in'
         else:
-            if line.type == 'advance_in_create':
-                type_ = 'in'
-            else:
-                type_ = 'out'
+            type_ = 'out'
 
-            advance = Advance(
-                receipt_line=line,
-                type=type_,
-                )
-
-        advance.origin = line.advance_origin
-        advance.state = 'confirmed'
+        advance = Advance(
+            receipt_line=line,
+            type=type_,
+            origin=line.advance_origin,
+            state='confirmed'
+            )
         advance.save()
 
-        if not line.advance or line.advance != advance:
-            line.advance = advance
-            line.save()
+        line.advance = advance
+        line.save()
 
     @classmethod
     def _set_advance_state(cls, lines, state):
-        Advance = Pool().get('cash_bank.advance')
-        to_update = []
         for line in lines:
             if not line.advance:
                 return
@@ -51,22 +44,32 @@ class Receipt(metaclass=PoolMeta):
             if line.type not in ['advance_in_create', 'advance_out_create']:
                 return
             line.advance.state = state
-            to_update.append(line.advance)
-        Advance.save(to_update)
+            line.advance.save()
 
     @classmethod
+    @ModelView.button
+    @Workflow.transition('draft')
     def draft(cls, receipts):
         super(Receipt, cls).draft(receipts)
         for receipt in receipts:
             cls._set_advance_state(receipt.lines, 'draft')
 
     @classmethod
+    @ModelView.button
+    @Workflow.transition('cancel')
     def cancel(cls, receipts):
         super(Receipt, cls).cancel(receipts)
+        Advance = Pool().get('cash_bank.advance')
+        advances_to_delete = []
         for receipt in receipts:
-            cls._set_advance_state(receipt.lines, 'cancel')
+            for line in receipt.lines:
+                if line.advance:
+                    advances_to_delete.append(line.advance)
+        Advance.delete(advances_to_delete)
 
     @classmethod
+    @ModelView.button
+    @Workflow.transition('confirmed')
     def confirm(cls, receipts):
         super(Receipt, cls).confirm(receipts)
         for receipt in receipts:
@@ -74,6 +77,8 @@ class Receipt(metaclass=PoolMeta):
                 cls._advance_confirm(line)
 
     @classmethod
+    @ModelView.button
+    @Workflow.transition('posted')
     def post(cls, receipts):
         super(Receipt, cls).post(receipts)
         for receipt in receipts:
@@ -240,7 +245,7 @@ class ReceiptLine(metaclass=PoolMeta):
             if self.type in \
                     ['advance_in_create', 'advance_out_create']:
                 check_greater = False
-                
+
             self._check_invalid_amount(amount_to_apply,
                     self.advance.rec_name, check_greater=check_greater)
 
