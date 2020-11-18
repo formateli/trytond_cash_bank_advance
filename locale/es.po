@@ -1,0 +1,157 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "field:cash_bank.configuration,default_collected_in_advanced_account:"
+msgid "Default Collected in Advanced Account"
+msgstr "Cuenta Cobrado por Anticipado por Defecto"
+
+msgctxt "field:cash_bank.configuration.account,default_collected_in_advanced_account:"
+msgid "Default Collected in Advanced Account"
+msgstr "Cuenta Cobrado por Anticipado por Defecto"
+
+msgctxt "field:cash_bank.configuration,default_paid_in_advanced_account:"
+msgid "Default Paid in Advanced Account"
+msgstr "Cuenta Pagado por Anticipado por Defecto"
+
+msgctxt "field:cash_bank.configuration.account,default_paid_in_advanced_account:"
+msgid "Default Paid in Advanced Account"
+msgstr "Cuenta Pagado por Anticipado por Defecto"
+
+msgctxt "selection:cash_bank.receipt.line,type:"
+msgid "Apply Collected in Advanced from Customer"
+msgstr "Aplicar Cobrado por Adelantado del Cliente"
+
+msgctxt "selection:cash_bank.receipt.line,type:"
+msgid "Create Collected in Advance from Customer"
+msgstr "Crear Cobrado por Adelantado del Cliente"
+
+msgctxt "selection:cash_bank.receipt.line,type:"
+msgid "Apply Paid in Advanced to Supplier"
+msgstr "Aplicar Pagado por Adelantado al Proveedor"
+
+msgctxt "selection:cash_bank.receipt.line,type:"
+msgid "Create Paid in Advance to Supplier"
+msgstr "Crear Pagado por Adelantado al Proveedor"
+
+msgctxt "field:cash_bank.receipt.line,advance:"
+msgid "Advance"
+msgstr "Por Adelantado"
+
+msgctxt "field:cash_bank.receipt.line,advance:"
+msgid "Origin"
+msgstr "Origen"
+
+msgctxt "field:cash_bank.advance,receipt_line:"
+msgid "Receipt Line"
+msgstr "Linea del Recibo"
+
+msgctxt "field:cash_bank.advance,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:cash_bank.advance,date:"
+msgid "Date"
+msgstr "Fecha"
+
+msgctxt "field:cash_bank.advance,party:"
+msgid "Party"
+msgstr "Tercero"
+
+msgctxt "field:cash_bank.advance,currency:"
+msgid "Currency"
+msgstr "Moneda"
+
+msgctxt "field:cash_bank.advance,type:"
+msgid "Type"
+msgstr "Tipo"
+
+msgctxt "field:cash_bank.advance,origin:"
+msgid "Origin"
+msgstr "Origen"
+
+msgctxt "field:cash_bank.advance,amount:"
+msgid "Amount"
+msgstr "Monto"
+
+msgctxt "field:cash_bank.advance,amount_applied:"
+msgid "Amount Applied"
+msgstr "Monto Aplicado"
+
+msgctxt "field:cash_bank.advance,amount_to_apply:"
+msgid "Amount to Apply"
+msgstr "Monto a Aplicar"
+
+msgctxt "field:cash_bank.advance,lines_applied:"
+msgid "Lines Applied"
+msgstr "Lineas Aplicadas"
+
+msgctxt "field:cash_bank.advance,state:"
+msgid "State"
+msgstr "Estado"
+
+msgctxt "selection:cash_bank.advance,type:"
+msgid "Collected in Advanced from Customer"
+msgstr "Cobrado por Adelantado al Cliente"
+
+msgctxt "selection:cash_bank.advance,type:"
+msgid "Paid in Advanced to Supplier"
+msgstr "Pagado por Adelantado al Proveedor"
+
+msgctxt "selection:cash_bank.advance,state:"
+msgid "Draft"
+msgstr "Borrador"
+
+msgctxt "selection:cash_bank.advance,state:"
+msgid "Confirmed"
+msgstr "Confirmado"
+
+msgctxt "selection:cash_bank.advance,state:"
+msgid "Pending"
+msgstr "Pendiente"
+
+msgctxt "selection:cash_bank.advance,state:"
+msgid "Applied"
+msgstr "Aplicado"
+
+msgctxt "selection:cash_bank.advance,state:"
+msgid "Canceled"
+msgstr "Cancelado"
+
+msgctxt "model:ir.ui.menu,name:menu_advance_form"
+msgid "Collected/Paid in Advanced"
+msgstr "Cobrado/Pagado por Adelantado"
+
+msgctxt "model:ir.action,name:act_advance_form"
+msgid "Collected/Paid in Advanced"
+msgstr "Cobrado/Pagado por Adelantado"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_form_domain_draft"
+msgid "Draft"
+msgstr "Borrador"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_form_domain_confirmed"
+msgid "Confirmed"
+msgstr "Confirmado"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_form_domain_cancel"
+msgid "Cancel"
+msgstr "Cancelado"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_form_domain_pending"
+msgid "Pending"
+msgstr "Pendiente"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_form_domain_applied"
+msgid "Applied"
+msgstr "Aplicado"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_form_domain_all"
+msgid "All"
+msgstr "Todo"
