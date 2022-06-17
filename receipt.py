@@ -139,7 +139,7 @@ class ReceiptLine(metaclass=PoolMeta):
                     Bool(Eval('invoice')),
                     Bool(Eval('advance')),
                 )
-        cls.party.depends += ['advance']
+        cls.party.depends.add('advance')
 
         cls.account.states['readonly'] = Or(
                 Eval('receipt_state') != 'draft',

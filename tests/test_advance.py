@@ -63,11 +63,11 @@ class AdvanceTestCase(ModuleTestCase):
 
             sequence = create_sequence(
                 'Cash/Bank Sequence',
-                'cash_bank.receipt',
+                'Cash and Bank Receipt',
                 company)
             sequence_convertion = create_sequence(
                 'Cash/Bank Convertion',
-                'cash_bank.convertion',
+                'Cash and Bank Convertion',
                 company)
 
             config.convertion_seq = sequence_convertion
@@ -382,8 +382,10 @@ class AdvanceTestCase(ModuleTestCase):
         return party
 
 
-def suite():
-    suite = trytond.tests.test_tryton.suite()
-    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
-        AdvanceTestCase))
-    return suite
+#def suite():
+#    suite = trytond.tests.test_tryton.suite()
+#    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
+#        AdvanceTestCase))
+#    return suite
+
+del ModuleTestCase
