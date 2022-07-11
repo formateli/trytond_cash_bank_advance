@@ -5,6 +5,8 @@ the full copyright notices and license terms. -->
 <form>
     <label name="receipt_line"/>
     <field name="receipt_line" colspan="3"/>
+    <label name="id"/>
+    <field name="id"/>
     <label name="date"/>
     <field name="date"/>
     <label name="type"/>

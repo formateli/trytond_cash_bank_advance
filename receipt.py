@@ -38,11 +38,11 @@ class Receipt(metaclass=PoolMeta):
     def _set_advance_state(cls, lines, state):
         for line in lines:
             if not line.advance:
-                return
+                continue
             if line.advance.state == 'applied':
-                return
+                continue
             if line.type not in ['advance_in_create', 'advance_out_create']:
-                return
+                continue
             line.advance.state = state
             line.advance.save()
 

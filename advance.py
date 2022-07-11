@@ -4,6 +4,7 @@
 from trytond.pool import Pool
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.pyson import Eval
+from trytond.modules.currency.fields import Monetary
 from decimal import Decimal
 
 
@@ -29,23 +30,20 @@ class Advance(ModelSQL, ModelView):
     currency = fields.Function(
         fields.Many2One('currency.currency', 'Currency'),
         'on_change_with_currency', searcher='search_currency')
-    currency_digits = fields.Function(
-        fields.Integer('Currency Digits'),
-        'on_change_with_currency_digits')
     type = fields.Selection([
         ('in', 'Collected in Advanced from Customer'),
         ('out', 'Paid in Advanced to Supplier'),
         ], 'Type', required=True, states=_states)
     origin = fields.Reference('Origin', selection='get_origin')
-    amount = fields.Function(fields.Numeric('Amount',
-        digits=(16, Eval('currency_digits', 2)),
-        depends=['currency_digits']), 'get_amount')
-    amount_applied = fields.Function(fields.Numeric('Amount Applied',
-        digits=(16, Eval('currency_digits', 2)),
-        depends=['currency_digits']), 'get_amount_applied')
-    amount_to_apply = fields.Function(fields.Numeric('Amount to Apply',
-        digits=(16, Eval('currency_digits', 2)),
-        depends=['currency_digits']), 'get_amount_to_apply')
+    amount = fields.Function(Monetary('Amount',
+        digits='currency', currency='currency'),
+        'get_amount')
+    amount_applied = fields.Function(Monetary('Amount Applied',
+        digits='currency', currency='currency'),
+        'get_amount_applied')
+    amount_to_apply = fields.Function(Monetary('Amount to Apply',
+        digits='currency', currency='currency'),
+        'get_amount_to_apply')
     lines_applied = fields.One2Many('cash_bank.advance.line_applied',
         'advance', 'Lines Applied',
         states={
@@ -116,12 +114,6 @@ class Advance(ModelSQL, ModelView):
     def search_currency(cls, name, clause):
         return [('receipt_line.receipt.currency', clause[1], clause[2])]
 
-    @fields.depends('currency')
-    def on_change_with_currency_digits(self, name=None):
-        if self.currency:
-            return self.currency.digits
-        return 2
-
     @fields.depends('receipt_line',
                     '_parent_receipt_line.receipt')
     def on_change_with_date(self, name=None):
@@ -165,12 +157,9 @@ class AdvanceLineApplied(ModelSQL, ModelView):
     currency = fields.Function(
         fields.Many2One('currency.currency', 'Currency'),
         'on_change_with_currency')
-    currency_digits = fields.Function(
-        fields.Integer('Currency Digits'),
-        'on_change_with_currency_digits')
-    amount = fields.Function(fields.Numeric('Amount',
-        digits=(16, Eval('currency_digits', 2)),
-        depends=['currency_digits']), 'get_amount')
+    amount = fields.Function(Monetary('Amount',
+        digits='currency', currency='currency'),
+        'get_amount')
 
     @fields.depends('receipt_line',
                     '_parent_receipt_line.receipt')
@@ -183,12 +172,6 @@ class AdvanceLineApplied(ModelSQL, ModelView):
     def on_change_with_currency(self, name=None):
         if self.receipt_line:
             return self.receipt_line.currency.id
-
-    @fields.depends('currency')
-    def on_change_with_currency_digits(self, name=None):
-        if self.currency:
-            return self.currency.digits
-        return 2
 
     def get_amount(self, name):
         res = Decimal('0.0')

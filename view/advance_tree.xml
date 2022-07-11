@@ -4,6 +4,7 @@ The COPYRIGHT file at the top level of this repository contains
 the full copyright notices and license terms. -->
 <tree>
     <field name="receipt_line"/>
+    <field name="id"/>
     <field name="date"/>
     <field name="type"/>
     <field name="amount"/>
