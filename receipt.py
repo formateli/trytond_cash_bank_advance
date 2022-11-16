@@ -249,6 +249,16 @@ class ReceiptLine(metaclass=PoolMeta):
             self._check_invalid_amount(amount_to_apply,
                     self.advance.rec_name, check_greater=check_greater)
 
+    @classmethod
+    def copy(cls, lines, default=None):
+        if default is None:
+            default = {}
+        else:
+            default = default.copy()
+        default.setdefault('advance', None)
+        default.setdefault('advance_origin', None)
+        return super().copy(lines, default=default)
+
     def reconcile(self):
         super(ReceiptLine, self).reconcile()
         pool = Pool()
