@@ -7,6 +7,7 @@ the full copyright notices and license terms. -->
     <field name="id"/>
     <field name="date"/>
     <field name="type"/>
+    <field name="advance_type"/>
     <field name="amount"/>
     <field name="amount_applied"/>
     <field name="amount_to_apply"/>

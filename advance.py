@@ -31,9 +31,14 @@ class Advance(ModelSQL, ModelView):
         fields.Many2One('currency.currency', 'Currency'),
         'on_change_with_currency', searcher='search_currency')
     type = fields.Selection([
-        ('in', 'Collected in Advanced from Customer'),
-        ('out', 'Paid in Advanced to Supplier'),
+        ('in', 'Collected in Advanced'),
+        ('out', 'Paid in Advanced'),
         ], 'Type', required=True, states=_states)
+    advance_type = fields.Selection([
+        (None, ''),
+        ('advance', 'In Advanced'),
+        ('loan', 'Loan'),
+        ], 'Advance Type')
     origin = fields.Reference('Origin', selection='get_origin')
     amount = fields.Function(Monetary('Amount',
         digits='currency', currency='currency'),

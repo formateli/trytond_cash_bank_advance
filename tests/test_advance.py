@@ -381,11 +381,4 @@ class AdvanceTestCase(ModuleTestCase):
         party.save()
         return party
 
-
-#def suite():
-#    suite = trytond.tests.test_tryton.suite()
-#    suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
-#        AdvanceTestCase))
-#    return suite
-
 del ModuleTestCase

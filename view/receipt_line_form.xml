@@ -5,7 +5,9 @@ the full copyright notices and license terms. -->
 <data>
     <xpath expr="/form/field[@name='invoice']" position="after">
         <label name="advance"/>
-        <field name="advance"/>
+	<field name="advance"/>
+        <label name="advance_type"/>
+	<field name="advance_type"/>
         <label name="advance_origin"/>
         <field name="advance_origin"/>
     </xpath>

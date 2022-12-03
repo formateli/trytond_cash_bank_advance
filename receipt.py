@@ -27,6 +27,7 @@ class Receipt(metaclass=PoolMeta):
             receipt_line=line,
             type=type_,
             origin=line.advance_origin,
+            advance_type=line.advance_type,
             state='confirmed'
             )
         advance.save()
@@ -116,6 +117,16 @@ class ReceiptLine(metaclass=PoolMeta):
                 Eval('type'), ['advance_in_apply', 'advance_out_apply']))
         },
         depends=['receipt_state', 'party', 'account', 'type'])
+    advance_type = fields.Selection([
+        (None, ''),
+        ('advance', 'In Advanced'),
+        ('loan', 'Loan'),
+        ], 'Advance Type',
+        states={
+            'readonly': Eval('receipt_state') != 'draft',
+            'invisible': Not(In(
+                Eval('type'), ['advance_in_create', 'advance_out_create']))
+            })
     advance_origin = fields.Reference(
         'Origin', selection='get_advance_origin',
         states={
@@ -128,10 +139,10 @@ class ReceiptLine(metaclass=PoolMeta):
     def __setup__(cls):
         super(ReceiptLine, cls).__setup__()
         cls.type.selection += [
-            ('advance_in_apply', 'Apply Collected in Advanced from Customer'),
-            ('advance_in_create', 'Create Collected in Advance from Customer'),
-            ('advance_out_apply', 'Apply Paid in Advanced to Supplier'),
-            ('advance_out_create', 'Create Paid in Advance to Supplier'),
+            ('advance_in_apply', 'Apply Collected in Advanced'),
+            ('advance_in_create', 'Create Collected in Advance'),
+            ('advance_out_apply', 'Apply Paid in Advanced'),
+            ('advance_out_create', 'Create Paid in Advance'),
             ]
 
         cls.party.states['readonly'] = Or(
@@ -189,6 +200,7 @@ class ReceiptLine(metaclass=PoolMeta):
         super(ReceiptLine, self).on_change_type()
         self.advance = None
         self.advance_origin = None
+        self.advance_type = None
 
     @fields.depends('advance', 'receipt',
                     '_parent_receipt.type')
@@ -257,6 +269,7 @@ class ReceiptLine(metaclass=PoolMeta):
             default = default.copy()
         default.setdefault('advance', None)
         default.setdefault('advance_origin', None)
+        default.setdefault('advance_type', None)
         return super().copy(lines, default=default)
 
     def reconcile(self):

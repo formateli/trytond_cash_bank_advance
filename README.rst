@@ -4,7 +4,7 @@ Cash & Bank Collected / Paid in Advanced
 Collected / Paid in advanced management.
 
 An advance can be created in a cash/bank receipt line, it could be
-*Collected from Customer* or *Paid to Supplier*, then in other receipt
+*Collected* or *Paid* in advance, type of *In Advanced* or *Loan*, then in other receipt
 it can be applied (entirely or partially) and, once it is applied
 completely, account move lines are reconciliated. 
 

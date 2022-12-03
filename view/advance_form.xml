@@ -11,6 +11,8 @@ the full copyright notices and license terms. -->
     <field name="date"/>
     <label name="type"/>
     <field name="type"/>
+    <label name="advance_type"/>
+    <field name="advance_type"/>
     <label name="amount"/>
     <field name="amount"/>
     <label name="origin"/>
