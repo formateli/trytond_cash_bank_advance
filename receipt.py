@@ -134,6 +134,12 @@ class ReceiptLine(metaclass=PoolMeta):
             'invisible': Not(
                 In(Eval('type'), ['advance_in_create', 'advance_out_create']))
         }, depends=['receipt_state', 'type'])
+    advance_id = fields.Function(fields.Integer('Advance ID',
+        states={
+            'invisible': Not(
+                In(Eval('type'), ['advance_in_create', 'advance_out_create']))
+        }, depends=['receipt_state', 'type']),
+        'get_advance_id')
 
     @classmethod
     def __setup__(cls):
@@ -171,6 +177,20 @@ class ReceiptLine(metaclass=PoolMeta):
                     []
                 )
             )
+
+    @fields.depends('id', 'type')
+    def get_advance_id(self, name=None):
+        pool = Pool()
+        Advance = pool.get('cash_bank.advance')
+        if self.id and self.type \
+                and self.type in ['advance_in_create', 'advance_out_create']:
+            advance = Advance.search([
+                ('receipt_line', '=', self.id)
+                ])
+            res = None
+            if advance:
+                res = advance[0].id
+            return res
 
     @classmethod
     def get_advance_origin(cls):

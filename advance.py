@@ -64,6 +64,14 @@ class Advance(ModelSQL, ModelView):
 
     del _states
 
+    @classmethod
+    def __setup__(cls):
+        super(Advance, cls).__setup__()
+        cls._order = [
+                ('receipt_line.receipt.date', 'DESC'),
+                ('id', 'DESC'),
+                ]
+
     @staticmethod
     def default_state():
         return 'draft'
