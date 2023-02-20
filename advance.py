@@ -17,7 +17,7 @@ class Advance(ModelSQL, ModelView):
         }
 
     receipt_line = fields.Many2One('cash_bank.receipt.line', 'Receipt Line',
-        required=True, ondelete='CASCADE', select=True,
+        required=True, ondelete='CASCADE',
         states={'readonly': True})
     company = fields.Function(
         fields.Many2One('company.company', 'Company'),
@@ -161,9 +161,9 @@ class AdvanceLineApplied(ModelSQL, ModelView):
     "Advance Line Applied"
     __name__ = "cash_bank.advance.line_applied"
     advance = fields.Many2One('cash_bank.advance', 'Advance',
-        required=True, ondelete='CASCADE', select=True)
+        required=True, ondelete='CASCADE')
     receipt_line = fields.Many2One('cash_bank.receipt.line', 'Receipt Line',
-        required=True, ondelete='RESTRICT', select=True,
+        required=True, ondelete='RESTRICT',
         states={'readonly': True})
     date = fields.Function(fields.Date('Date'),
         'on_change_with_date')
