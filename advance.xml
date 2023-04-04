@@ -4,6 +4,9 @@ The COPYRIGHT file at the top level of this repository contains
 the full copyright notices and license terms. -->
 <tryton>
     <data>
+        <menuitem parent="cash_bank.menu_cash_bank" sequence="50"
+		name="Collected/Paid in Advanced" id="menu_advance"/>
+
         <!-- Advance -->
 
         <record model="ir.ui.view" id="advance_view_form">
@@ -16,8 +19,96 @@ the full copyright notices and license terms. -->
             <field name="type">tree</field>
             <field name="name">advance_tree</field>
         </record>
+
+
+        <!-- Collected -->
+
+        <record model="ir.action.act_window" id="act_advance_collect_form">
+            <field name="name">Collected in Advanced</field>
+            <field name="res_model">cash_bank.advance</field>
+            <field name="search_value"></field>
+        </record>
+        <record model="ir.action.act_window.view"
+                id="act_advance_collect_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="advance_view_tree"/>
+            <field name="act_window" ref="act_advance_collect_form"/>
+        </record>
+        <record model="ir.action.act_window.view"
+                id="act_advance_collect_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="advance_view_form"/>
+            <field name="act_window" ref="act_advance_collect_form"/>
+        </record>
+
+        <record model="ir.action.act_window.domain" id="act_advance_collect_form_domain_pending">
+            <field name="name">Pending</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain"
+                eval="[('state', '=', 'pending'), ('type', '=', 'in'), ('company', If( And (Eval('context', {}).contains('company'), Eval('context', {}).get('company', None) != None), '=', '!=') , Eval('context', {}).get('company', -1))]"
+                pyson="1"/>
+            <field name="count" eval="True"/>
+            <field name="act_window" ref="act_advance_collect_form"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_advance_collect_form_domain_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="9999"/>
+            <field name="domain"
+                eval="[('type', '=', 'in'), ('company', If( And (Eval('context', {}).contains('company'), Eval('context', {}).get('company', None) != None), '=', '!=') , Eval('context', {}).get('company', -1))]"
+                pyson="1"/>
+            <field name="act_window" ref="act_advance_collect_form"/>
+        </record>
+
+        <menuitem parent="menu_advance" sequence="10"
+            action="act_advance_collect_form" id="menu_advance_collect_form"/>
+
+
+        <!-- paid -->
+
+        <record model="ir.action.act_window" id="act_advance_pay_form">
+            <field name="name">Paid in Advanced</field>
+            <field name="res_model">cash_bank.advance</field>
+            <field name="search_value"></field>
+        </record>
+        <record model="ir.action.act_window.view"
+                id="act_advance_pay_form_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="advance_view_tree"/>
+            <field name="act_window" ref="act_advance_pay_form"/>
+        </record>
+        <record model="ir.action.act_window.view"
+                id="act_advance_pay_form_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="advance_view_form"/>
+            <field name="act_window" ref="act_advance_pay_form"/>
+        </record>
+
+        <record model="ir.action.act_window.domain" id="act_advance_pay_form_domain_pending">
+            <field name="name">Pending</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain"
+                eval="[('state', '=', 'pending'), ('type', '=', 'out'), ('company', If( And (Eval('context', {}).contains('company'), Eval('context', {}).get('company', None) != None), '=', '!=') , Eval('context', {}).get('company', -1))]"
+                pyson="1"/>
+            <field name="count" eval="True"/>
+            <field name="act_window" ref="act_advance_pay_form"/>
+        </record>
+        <record model="ir.action.act_window.domain" id="act_advance_pay_form_domain_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="9999"/>
+            <field name="domain"
+                eval="[('type', '=', 'out'), ('company', If( And (Eval('context', {}).contains('company'), Eval('context', {}).get('company', None) != None), '=', '!=') , Eval('context', {}).get('company', -1))]"
+                pyson="1"/>
+            <field name="act_window" ref="act_advance_pay_form"/>
+        </record>
+
+        <menuitem parent="menu_advance" sequence="20"
+            action="act_advance_pay_form" id="menu_advance_pay_form"/>
+
+
+        <!-- All -->
+
         <record model="ir.action.act_window" id="act_advance_form">
-            <field name="name">Collected/Paid in Advanced</field>
+            <field name="name">All</field>
             <field name="res_model">cash_bank.advance</field>
             <field name="search_value"></field>
         </record>
@@ -87,7 +178,7 @@ the full copyright notices and license terms. -->
             <field name="act_window" ref="act_advance_form"/>
         </record>
 
-        <menuitem parent="cash_bank.menu_cash_bank" sequence="50"
+        <menuitem parent="menu_advance" sequence="30"
             action="act_advance_form" id="menu_advance_form"/>
 
         <record model="ir.model.access" id="access_advance">
