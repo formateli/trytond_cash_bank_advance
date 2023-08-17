@@ -193,3 +193,51 @@ class AdvanceLineApplied(ModelSQL, ModelView):
                 self.receipt_line.line_move.debit \
                 - self.receipt_line.line_move.credit
         return abs(res)
+
+
+class AdvanceAgedBalanceContext(ModelView):
+    'Advance Aged Balance Context'
+    __name__ = 'cash_bank.advance.aged_balance.context'
+    type = fields.Selection([
+        (None, ''),
+        ('in', 'Collected in Advanced'),
+        ('out', 'Paid in Advanced'),
+        ],
+        "Type")
+    date = fields.Date('Date', required=True)
+    company = fields.Many2One('company.company', 'Company', required=True)
+
+    @classmethod
+    def default_date(cls):
+        return Pool().get('ir.date').today()
+
+    @staticmethod
+    def default_company():
+        return Transaction().context.get('company')
+
+
+class AdvanveAgedBalance(ModelSQL, ModelView):
+    'Advance Aged Balance'
+    __name__ = 'cash_bank.advance.aged_balance'
+
+    party = fields.Many2One('party.party', 'Party')
+    company = fields.Many2One('company.company', 'Company')
+    amount = Monetary(
+        "Amount", currency='currency', digits='currency')
+    paid = Monetary(
+        "Paid", currency='currency', digits='currency')
+    to_pay = Monetary(
+        "To Pay", currency='currency', digits='currency')
+    currency = fields.Function(fields.Many2One(
+            'currency.currency', "Currency"), 'get_currency')
+
+    def get_currency(self, name):
+        return self.company.currency.id
+
+    @classmethod
+    def table_query(cls):
+        pool = Pool()
+        context = Transaction().context
+
+        Advance = pool.get('cash_bank.advance')
+        advance = Advance.__table__()

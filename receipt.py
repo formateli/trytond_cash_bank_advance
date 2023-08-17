@@ -11,6 +11,14 @@ class Receipt(metaclass=PoolMeta):
     __name__ = 'cash_bank.receipt'
 
     @classmethod
+    def _advance_can_delete(cls, line):
+        pool = Pool()
+        Advance = pool.get('cash_bank.advance')
+        if line.type not in ['advance_in_create', 'advance_out_create']:
+            return
+        return True
+
+    @classmethod
     def _advance_confirm(cls, line):
         pool = Pool()
         Advance = pool.get('cash_bank.advance')
@@ -64,7 +72,7 @@ class Receipt(metaclass=PoolMeta):
         advances_to_delete = []
         for receipt in receipts:
             for line in receipt.lines:
-                if line.advance:
+                if line.advance and cls._advance_can_delete(line):
                     advances_to_delete.append(line.advance)
         Advance.delete(advances_to_delete)
 
@@ -75,6 +83,7 @@ class Receipt(metaclass=PoolMeta):
         super(Receipt, cls).confirm(receipts)
         for receipt in receipts:
             for line in receipt.lines:
+                # Create Advance
                 cls._advance_confirm(line)
 
     @classmethod
