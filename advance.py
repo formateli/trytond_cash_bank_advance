@@ -4,6 +4,7 @@
 from trytond.pool import Pool
 from trytond.model import ModelView, ModelSQL, fields
 from trytond.pyson import Eval
+from trytond.modules.currency.fields import Monetary
 from decimal import Decimal
 
 
@@ -16,7 +17,7 @@ class Advance(ModelSQL, ModelView):
         }
 
     receipt_line = fields.Many2One('cash_bank.receipt.line', 'Receipt Line',
-        required=True, ondelete='CASCADE', select=True,
+        required=True, ondelete='CASCADE',
         states={'readonly': True})
     company = fields.Function(
         fields.Many2One('company.company', 'Company'),
@@ -29,23 +30,25 @@ class Advance(ModelSQL, ModelView):
     currency = fields.Function(
         fields.Many2One('currency.currency', 'Currency'),
         'on_change_with_currency', searcher='search_currency')
-    currency_digits = fields.Function(
-        fields.Integer('Currency Digits'),
-        'on_change_with_currency_digits')
     type = fields.Selection([
-        ('in', 'Collected in Advanced from Customer'),
-        ('out', 'Paid in Advanced to Supplier'),
+        ('in', 'Collected in Advanced'),
+        ('out', 'Paid in Advanced'),
         ], 'Type', required=True, states=_states)
+    advance_type = fields.Selection([
+        (None, ''),
+        ('advance', 'In Advanced'),
+        ('loan', 'Loan'),
+        ], 'Advance Type')
     origin = fields.Reference('Origin', selection='get_origin')
-    amount = fields.Function(fields.Numeric('Amount',
-        digits=(16, Eval('currency_digits', 2)),
-        depends=['currency_digits']), 'get_amount')
-    amount_applied = fields.Function(fields.Numeric('Amount Applied',
-        digits=(16, Eval('currency_digits', 2)),
-        depends=['currency_digits']), 'get_amount_applied')
-    amount_to_apply = fields.Function(fields.Numeric('Amount to Apply',
-        digits=(16, Eval('currency_digits', 2)),
-        depends=['currency_digits']), 'get_amount_to_apply')
+    amount = fields.Function(Monetary('Amount',
+        digits='currency', currency='currency'),
+        'get_amount')
+    amount_applied = fields.Function(Monetary('Amount Applied',
+        digits='currency', currency='currency'),
+        'get_amount_applied')
+    amount_to_apply = fields.Function(Monetary('Amount to Apply',
+        digits='currency', currency='currency'),
+        'get_amount_to_apply')
     lines_applied = fields.One2Many('cash_bank.advance.line_applied',
         'advance', 'Lines Applied',
         states={
@@ -60,6 +63,14 @@ class Advance(ModelSQL, ModelView):
         ], 'State', readonly=True, required=True)
 
     del _states
+
+    @classmethod
+    def __setup__(cls):
+        super(Advance, cls).__setup__()
+        cls._order = [
+                ('receipt_line.receipt.date', 'DESC'),
+                ('id', 'DESC'),
+                ]
 
     @staticmethod
     def default_state():
@@ -116,12 +127,6 @@ class Advance(ModelSQL, ModelView):
     def search_currency(cls, name, clause):
         return [('receipt_line.receipt.currency', clause[1], clause[2])]
 
-    @fields.depends('currency')
-    def on_change_with_currency_digits(self, name=None):
-        if self.currency:
-            return self.currency.digits
-        return 2
-
     @fields.depends('receipt_line',
                     '_parent_receipt_line.receipt')
     def on_change_with_date(self, name=None):
@@ -156,21 +161,18 @@ class AdvanceLineApplied(ModelSQL, ModelView):
     "Advance Line Applied"
     __name__ = "cash_bank.advance.line_applied"
     advance = fields.Many2One('cash_bank.advance', 'Advance',
-        required=True, ondelete='CASCADE', select=True)
+        required=True, ondelete='CASCADE')
     receipt_line = fields.Many2One('cash_bank.receipt.line', 'Receipt Line',
-        required=True, ondelete='RESTRICT', select=True,
+        required=True, ondelete='RESTRICT',
         states={'readonly': True})
     date = fields.Function(fields.Date('Date'),
         'on_change_with_date')
     currency = fields.Function(
         fields.Many2One('currency.currency', 'Currency'),
         'on_change_with_currency')
-    currency_digits = fields.Function(
-        fields.Integer('Currency Digits'),
-        'on_change_with_currency_digits')
-    amount = fields.Function(fields.Numeric('Amount',
-        digits=(16, Eval('currency_digits', 2)),
-        depends=['currency_digits']), 'get_amount')
+    amount = fields.Function(Monetary('Amount',
+        digits='currency', currency='currency'),
+        'get_amount')
 
     @fields.depends('receipt_line',
                     '_parent_receipt_line.receipt')
@@ -184,12 +186,6 @@ class AdvanceLineApplied(ModelSQL, ModelView):
         if self.receipt_line:
             return self.receipt_line.currency.id
 
-    @fields.depends('currency')
-    def on_change_with_currency_digits(self, name=None):
-        if self.currency:
-            return self.currency.digits
-        return 2
-
     def get_amount(self, name):
         res = Decimal('0.0')
         if self.receipt_line and self.receipt_line.line_move:
@@ -197,3 +193,51 @@ class AdvanceLineApplied(ModelSQL, ModelView):
                 self.receipt_line.line_move.debit \
                 - self.receipt_line.line_move.credit
         return abs(res)
+
+
+class AdvanceAgedBalanceContext(ModelView):
+    'Advance Aged Balance Context'
+    __name__ = 'cash_bank.advance.aged_balance.context'
+    type = fields.Selection([
+        (None, ''),
+        ('in', 'Collected in Advanced'),
+        ('out', 'Paid in Advanced'),
+        ],
+        "Type")
+    date = fields.Date('Date', required=True)
+    company = fields.Many2One('company.company', 'Company', required=True)
+
+    @classmethod
+    def default_date(cls):
+        return Pool().get('ir.date').today()
+
+    @staticmethod
+    def default_company():
+        return Transaction().context.get('company')
+
+
+class AdvanveAgedBalance(ModelSQL, ModelView):
+    'Advance Aged Balance'
+    __name__ = 'cash_bank.advance.aged_balance'
+
+    party = fields.Many2One('party.party', 'Party')
+    company = fields.Many2One('company.company', 'Company')
+    amount = Monetary(
+        "Amount", currency='currency', digits='currency')
+    paid = Monetary(
+        "Paid", currency='currency', digits='currency')
+    to_pay = Monetary(
+        "To Pay", currency='currency', digits='currency')
+    currency = fields.Function(fields.Many2One(
+            'currency.currency', "Currency"), 'get_currency')
+
+    def get_currency(self, name):
+        return self.company.currency.id
+
+    @classmethod
+    def table_query(cls):
+        pool = Pool()
+        context = Transaction().context
+
+        Advance = pool.get('cash_bank.advance')
+        advance = Advance.__table__()

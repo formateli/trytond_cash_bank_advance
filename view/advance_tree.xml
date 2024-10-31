@@ -3,11 +3,15 @@
 The COPYRIGHT file at the top level of this repository contains
 the full copyright notices and license terms. -->
 <tree>
-    <field name="receipt_line"/>
+    <field name="id"/>
     <field name="date"/>
+    <field name="party" expand="1"/>
     <field name="type"/>
+    <field name="advance_type"/>
     <field name="amount"/>
     <field name="amount_applied"/>
     <field name="amount_to_apply"/>
-    <field name="state"/>
+    <field name="receipt_line" optional="0"/>
+    <field name="company" optional="0"/>
+    <field name="state" optional="1"/>
 </tree>

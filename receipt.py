@@ -11,6 +11,14 @@ class Receipt(metaclass=PoolMeta):
     __name__ = 'cash_bank.receipt'
 
     @classmethod
+    def _advance_can_delete(cls, line):
+        pool = Pool()
+        Advance = pool.get('cash_bank.advance')
+        if line.type not in ['advance_in_create', 'advance_out_create']:
+            return
+        return True
+
+    @classmethod
     def _advance_confirm(cls, line):
         pool = Pool()
         Advance = pool.get('cash_bank.advance')
@@ -27,6 +35,7 @@ class Receipt(metaclass=PoolMeta):
             receipt_line=line,
             type=type_,
             origin=line.advance_origin,
+            advance_type=line.advance_type,
             state='confirmed'
             )
         advance.save()
@@ -38,11 +47,11 @@ class Receipt(metaclass=PoolMeta):
     def _set_advance_state(cls, lines, state):
         for line in lines:
             if not line.advance:
-                return
+                continue
             if line.advance.state == 'applied':
-                return
+                continue
             if line.type not in ['advance_in_create', 'advance_out_create']:
-                return
+                continue
             line.advance.state = state
             line.advance.save()
 
@@ -63,7 +72,7 @@ class Receipt(metaclass=PoolMeta):
         advances_to_delete = []
         for receipt in receipts:
             for line in receipt.lines:
-                if line.advance:
+                if line.advance and cls._advance_can_delete(line):
                     advances_to_delete.append(line.advance)
         Advance.delete(advances_to_delete)
 
@@ -74,6 +83,7 @@ class Receipt(metaclass=PoolMeta):
         super(Receipt, cls).confirm(receipts)
         for receipt in receipts:
             for line in receipt.lines:
+                # Create Advance
                 cls._advance_confirm(line)
 
     @classmethod
@@ -116,6 +126,16 @@ class ReceiptLine(metaclass=PoolMeta):
                 Eval('type'), ['advance_in_apply', 'advance_out_apply']))
         },
         depends=['receipt_state', 'party', 'account', 'type'])
+    advance_type = fields.Selection([
+        (None, ''),
+        ('advance', 'In Advanced'),
+        ('loan', 'Loan'),
+        ], 'Advance Type',
+        states={
+            'readonly': Eval('receipt_state') != 'draft',
+            'invisible': Not(In(
+                Eval('type'), ['advance_in_create', 'advance_out_create']))
+            })
     advance_origin = fields.Reference(
         'Origin', selection='get_advance_origin',
         states={
@@ -123,15 +143,21 @@ class ReceiptLine(metaclass=PoolMeta):
             'invisible': Not(
                 In(Eval('type'), ['advance_in_create', 'advance_out_create']))
         }, depends=['receipt_state', 'type'])
+    advance_id = fields.Function(fields.Integer('Advance ID',
+        states={
+            'invisible': Not(
+                In(Eval('type'), ['advance_in_create', 'advance_out_create']))
+        }, depends=['receipt_state', 'type']),
+        'get_advance_id')
 
     @classmethod
     def __setup__(cls):
         super(ReceiptLine, cls).__setup__()
         cls.type.selection += [
-            ('advance_in_apply', 'Apply Collected in Advanced from Customer'),
-            ('advance_in_create', 'Create Collected in Advance from Customer'),
-            ('advance_out_apply', 'Apply Paid in Advanced to Supplier'),
-            ('advance_out_create', 'Create Paid in Advance to Supplier'),
+            ('advance_in_apply', 'Apply Collected in Advanced'),
+            ('advance_in_create', 'Create Collected in Advance'),
+            ('advance_out_apply', 'Apply Paid in Advanced'),
+            ('advance_out_create', 'Create Paid in Advance'),
             ]
 
         cls.party.states['readonly'] = Or(
@@ -139,7 +165,7 @@ class ReceiptLine(metaclass=PoolMeta):
                     Bool(Eval('invoice')),
                     Bool(Eval('advance')),
                 )
-        cls.party.depends += ['advance']
+        cls.party.depends.add('advance')
 
         cls.account.states['readonly'] = Or(
                 Eval('receipt_state') != 'draft',
@@ -160,6 +186,20 @@ class ReceiptLine(metaclass=PoolMeta):
                     []
                 )
             )
+
+    @fields.depends('id', 'type')
+    def get_advance_id(self, name=None):
+        pool = Pool()
+        Advance = pool.get('cash_bank.advance')
+        if self.id and self.type \
+                and self.type in ['advance_in_create', 'advance_out_create']:
+            advance = Advance.search([
+                ('receipt_line', '=', self.id)
+                ])
+            res = None
+            if advance:
+                res = advance[0].id
+            return res
 
     @classmethod
     def get_advance_origin(cls):
@@ -189,6 +229,7 @@ class ReceiptLine(metaclass=PoolMeta):
         super(ReceiptLine, self).on_change_type()
         self.advance = None
         self.advance_origin = None
+        self.advance_type = None
 
     @fields.depends('advance', 'receipt',
                     '_parent_receipt.type')
@@ -248,6 +289,17 @@ class ReceiptLine(metaclass=PoolMeta):
 
             self._check_invalid_amount(amount_to_apply,
                     self.advance.rec_name, check_greater=check_greater)
+
+    @classmethod
+    def copy(cls, lines, default=None):
+        if default is None:
+            default = {}
+        else:
+            default = default.copy()
+        default.setdefault('advance', None)
+        default.setdefault('advance_origin', None)
+        default.setdefault('advance_type', None)
+        return super().copy(lines, default=default)
 
     def reconcile(self):
         super(ReceiptLine, self).reconcile()

@@ -19,28 +19,32 @@ msgid "Default Paid in Advanced Account"
 msgstr "Cuenta Pagado por Anticipado por Defecto"
 
 msgctxt "selection:cash_bank.receipt.line,type:"
-msgid "Apply Collected in Advanced from Customer"
-msgstr "Aplicar Cobrado por Adelantado del Cliente"
+msgid "Apply Collected in Advanced"
+msgstr "Aplicar Cobrado por Adelantado"
 
 msgctxt "selection:cash_bank.receipt.line,type:"
-msgid "Create Collected in Advance from Customer"
-msgstr "Crear Cobrado por Adelantado del Cliente"
+msgid "Create Collected in Advance"
+msgstr "Crear Cobrado por Adelantado"
 
 msgctxt "selection:cash_bank.receipt.line,type:"
-msgid "Apply Paid in Advanced to Supplier"
-msgstr "Aplicar Pagado por Adelantado al Proveedor"
+msgid "Apply Paid in Advanced"
+msgstr "Aplicar Pagado por Adelantado"
 
 msgctxt "selection:cash_bank.receipt.line,type:"
-msgid "Create Paid in Advance to Supplier"
-msgstr "Crear Pagado por Adelantado al Proveedor"
+msgid "Create Paid in Advance"
+msgstr "Crear Pagado por Adelantado"
 
 msgctxt "field:cash_bank.receipt.line,advance:"
 msgid "Advance"
 msgstr "Por Adelantado"
 
-msgctxt "field:cash_bank.receipt.line,advance:"
+msgctxt "field:cash_bank.receipt.line,advance_origin:"
 msgid "Origin"
 msgstr "Origen"
+
+msgctxt "field:cash_bank.receipt.line,advance_type:"
+msgid "Advance Type"
+msgstr "Tipo de Avance"
 
 msgctxt "field:cash_bank.advance,receipt_line:"
 msgid "Receipt Line"
@@ -65,6 +69,10 @@ msgstr "Moneda"
 msgctxt "field:cash_bank.advance,type:"
 msgid "Type"
 msgstr "Tipo"
+
+msgctxt "field:cash_bank.advance,advance_type:"
+msgid "Advance Type"
+msgstr "Tipo de Avance"
 
 msgctxt "field:cash_bank.advance,origin:"
 msgid "Origin"
@@ -91,12 +99,28 @@ msgid "State"
 msgstr "Estado"
 
 msgctxt "selection:cash_bank.advance,type:"
-msgid "Collected in Advanced from Customer"
-msgstr "Cobrado por Adelantado al Cliente"
+msgid "Collected in Advanced"
+msgstr "Cobrado por Adelantado"
 
 msgctxt "selection:cash_bank.advance,type:"
-msgid "Paid in Advanced to Supplier"
-msgstr "Pagado por Adelantado al Proveedor"
+msgid "Paid in Advanced"
+msgstr "Pagado por Adelantado"
+
+msgctxt "selection:cash_bank.advance,advance_type:"
+msgid "In Advanced"
+msgstr "Por Adelantado"
+
+msgctxt "selection:cash_bank.advance,advance_type:"
+msgid "Loan"
+msgstr "Préstamo"
+
+msgctxt "selection:cash_bank.receipt.line,advance_type:"
+msgid "In Advanced"
+msgstr "Por Adelantado"
+
+msgctxt "selection:cash_bank.receipt.line,advance_type:"
+msgid "Loan"
+msgstr "Préstamo"
 
 msgctxt "selection:cash_bank.advance,state:"
 msgid "Draft"
@@ -118,13 +142,53 @@ msgctxt "selection:cash_bank.advance,state:"
 msgid "Canceled"
 msgstr "Cancelado"
 
-msgctxt "model:ir.ui.menu,name:menu_advance_form"
+msgctxt "model:ir.ui.menu,name:menu_advance"
 msgid "Collected/Paid in Advanced"
 msgstr "Cobrado/Pagado por Adelantado"
 
+msgctxt "model:ir.ui.menu,name:menu_advance_collect_form"
+msgid "Collected in Advanced"
+msgstr "Cobrado por Adelantado"
+
+msgctxt "model:ir.action,name:act_advance_collect_form"
+msgid "Collected in Advanced"
+msgstr "Cobrado por Adelantado"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_collect_form_domain_pending"
+msgid "Pending"
+msgstr "Pendiente"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_collect_form_domain_all"
+msgid "All"
+msgstr "Todo"
+
+msgctxt "model:ir.ui.menu,name:menu_advance_pay_form"
+msgid "Paid in Advanced"
+msgstr "Pagado por Adelantado"
+
+msgctxt "model:ir.action,name:act_advance_pay_form"
+msgid "Paid in Advanced"
+msgstr "Pagado por Adelantado"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_pay_form_domain_pending"
+msgid "Pending"
+msgstr "Pendiente"
+
+msgctxt ""
+"model:ir.action.act_window.domain,name:act_advance_pay_form_domain_all"
+msgid "All"
+msgstr "Todo"
+
+msgctxt "model:ir.ui.menu,name:menu_advance_form"
+msgid "All"
+msgstr "Todo"
+
 msgctxt "model:ir.action,name:act_advance_form"
-msgid "Collected/Paid in Advanced"
-msgstr "Cobrado/Pagado por Adelantado"
+msgid "All"
+msgstr "Todo"
 
 msgctxt ""
 "model:ir.action.act_window.domain,name:act_advance_form_domain_draft"
