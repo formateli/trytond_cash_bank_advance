@@ -182,14 +182,14 @@ the full copyright notices and license terms. -->
             action="act_advance_form" id="menu_advance_form"/>
 
         <record model="ir.model.access" id="access_advance">
-            <field name="model" search="[('model', '=', 'cash_bank.advance')]"/>
+	    <field name="model">cash_bank.advance</field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_delete" eval="False"/>
         </record>
         <record model="ir.model.access" id="access_advance_group_cash_bank">
-            <field name="model" search="[('model', '=', 'cash_bank.advance')]"/>
+	    <field name="model">cash_bank.advance</field>
             <field name="group" ref="cash_bank.group_cash_bank"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
@@ -211,14 +211,14 @@ the full copyright notices and license terms. -->
         </record>
 
         <record model="ir.model.access" id="access_advance_line_applied">
-            <field name="model" search="[('model', '=', 'cash_bank.advance.line_applied')]"/>
+	    <field name="model">cash_bank.advance.line_applied</field>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>
             <field name="perm_create" eval="False"/>
             <field name="perm_delete" eval="False"/>
         </record>
         <record model="ir.model.access" id="access_advance_line_applied_group_cash_bank">
-            <field name="model" search="[('model', '=', 'cash_bank.advance.line_applied')]"/>
+	    <field name="model">cash_bank.advance.line_applied</field>
             <field name="group" ref="cash_bank.group_cash_bank"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="True"/>
