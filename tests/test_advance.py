@@ -39,20 +39,24 @@ class AdvanceTestCase(ModuleTestCase):
             create_fiscalyear(company)
 
             account_cash, = Account.search([
-                    ('name', '=', 'Main Cash'),
+                    ('code', '=', '1.1.1'),
                     ])
             account_revenue, = Account.search([
-                    ('name', '=', 'Main Revenue'),
-                    ])
+                    ('type.revenue', '=', True),
+                    ('closed', '=', False),
+                    ], limit=1)
             account_expense, = Account.search([
-                    ('name', '=', 'Main Expense'),
-                    ])
+                    ('type.expense', '=', True),
+                    ('closed', '=', False),
+                    ], limit=1)
             account_receivable, = Account.search([
-                    ('name', '=', 'Main Receivable'),
-                    ])
+                    ('type.receivable', '=', True),
+                    ('closed', '=', False),
+                    ], limit=1)
             account_payable, = Account.search([
-                    ('name', '=', 'Main Payable'),
-                    ])
+                    ('type.payable', '=', True),
+                    ('closed', '=', False),
+                    ], limit=1)
 
             config = Config(
                 default_collected_in_advanced_account=account_payable,
