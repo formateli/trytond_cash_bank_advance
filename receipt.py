@@ -208,9 +208,9 @@ class ReceiptLine(metaclass=PoolMeta):
         Advance = pool.get('cash_bank.advance')
         models = Advance._get_origin()
         models = Model.search([
-                ('model', 'in', models),
+                ('name', 'in', models),
                 ])
-        return [('', '')] + [(m.model, m.name) for m in models]
+        return [('', '')] + [(m.name, m.string) for m in models]
 
     @fields.depends('party', 'type')
     def on_change_party(self):
