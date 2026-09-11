@@ -18,7 +18,7 @@ class Advance(ModelSQL, ModelView):
 
     receipt_line = fields.Many2One('cash_bank.receipt.line', 'Receipt Line',
         required=True, ondelete='CASCADE',
-        states={'readonly': True})
+        states=_states)
     company = fields.Function(
         fields.Many2One('company.company', 'Company'),
         'on_change_with_company', searcher='search_company')
@@ -51,9 +51,7 @@ class Advance(ModelSQL, ModelView):
         'get_amount_to_apply')
     lines_applied = fields.One2Many('cash_bank.advance.line_applied',
         'advance', 'Lines Applied',
-        states={
-            'readonly': True,
-        })
+        states=_states)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('confirmed', 'Confirmed'),
